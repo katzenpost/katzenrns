@@ -14,7 +14,7 @@ requires-python = ">=3.10"
 license = "AGPL-3.0-only"
 authors = [{ name = "David Stainton" }]
 dependencies = [
-    "pigeonhole-protocols @ git+https://github.com/katzenpost/pigeonhole_protocols@python#subdirectory=py",
+    "pigeonhole-protocols @ git+https://github.com/katzenpost/pigeonhole_protocols@main#subdirectory=py",
     "pigeonhole-rns @ git+https://github.com/katzenpost/katzenpost@reticulum-bridge#subdirectory=reticulum",
     "rns>=1.0",
     "hpqc>=0.0.93",

@@ -42,7 +42,7 @@ jobs:
         run: |
           sudo apt-get update && sudo apt-get install -y gcc libegl1 libgl1
           pip install -e .
-          go install github.com/katzenpost/pigeonhole_protocols/cmd/katzenqt1@python
+          go install github.com/katzenpost/pigeonhole_protocols/cmd/katzenqt1@epoch-at-creation
           echo "$HOME/go/bin" >> "$GITHUB_PATH"
       - name: katzenrns founds, katzenqt1 joins
         run: scripts/interop.sh host "$PWD/katzenpost" "$RUNNER_TEMP/host"
