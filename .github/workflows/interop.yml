@@ -1,0 +1,58 @@
+name: interop
+# A katzenrns shell on a Reticulum mesh and a Katzenpost mixnet client in one group, through
+# the bridge replica, on a docker mixnet. The mixnet client is pigeonhole_protocols' katzenqt1,
+# which speaks the same protocol katzenqt does and is interop-tested against it there.
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    - cron: "0 6 * * *"
+jobs:
+  bridge:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      no_mixdecoy: true
+      no_decoy: true
+      epoch_duration: 2m
+      no_metrics: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: katzenpost/katzenpost
+          ref: reticulum-bridge
+          path: katzenpost
+      - uses: actions/setup-go@v5
+        with:
+          go-version: ">=1.26"
+          cache: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Configure podman socket
+        run: systemctl --user start podman.socket || true
+      - name: Build and start the mixnet, with a bridge replica
+        run: cd katzenpost/docker && make start wait
+      - name: Start the mesh replica bridged to replica1
+        run: cd katzenpost/docker && make reticulum-start
+      - name: Install katzenrns and the Go mixnet client
+        run: |
+          sudo apt-get update && sudo apt-get install -y gcc libegl1 libgl1
+          pip install -e .
+          go install github.com/katzenpost/pigeonhole_protocols/cmd/katzenqt1@main
+          echo "$HOME/go/bin" >> "$GITHUB_PATH"
+      - name: katzenrns founds, katzenqt1 joins
+        run: scripts/interop.sh host "$PWD/katzenpost" "$RUNNER_TEMP/host"
+      - name: katzenqt1 founds, katzenrns joins
+        run: scripts/interop.sh guest "$PWD/katzenpost" "$RUNNER_TEMP/guest"
+      - name: Logs
+        if: failure()
+        run: |
+          for f in "$RUNNER_TEMP"/*/*.out "$RUNNER_TEMP"/*/*.err; do echo "--- $f"; tail -40 "$f"; done
+          cd katzenpost/docker && make reticulum-logs | tail -60
+      - name: Stop the mixnet
+        if: always()
+        run: cd katzenpost/docker && make reticulum-stop stop || true

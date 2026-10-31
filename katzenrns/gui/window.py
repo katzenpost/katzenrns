@@ -13,7 +13,7 @@ from typing import Optional
 
 from pigeonhole_protocols.katzenqt1 import engine as eng
 from PySide6.QtCore import QRect, QSize, Qt, Signal
-from PySide6.QtGui import QAction, QColor, QFontMetrics, QPainter, QPalette, QTextDocument, QTextOption
+from PySide6.QtGui import QAction, QFont, QFontMetrics, QPainter, QPalette, QTextDocument, QTextOption
 from PySide6.QtWidgets import (
     QHBoxLayout,
     QLabel,
@@ -71,7 +71,7 @@ class LineDelegate(QStyledItemDelegate):
         if index.data(models.NOTICE):
             painter.fillRect(QRect(r.left() + PAD, r.top() + PAD, 3, r.height() - 2 * PAD), pal.color(QPalette.ColorRole.Mid))
             painter.setPen(pal.color(QPalette.ColorRole.PlaceholderText))
-            f = option.font
+            f = QFont(option.font)
             f.setItalic(True)
             painter.setFont(f)
             painter.drawText(QRect(r.left() + 3 * PAD, r.top() + PAD, r.width() - 4 * PAD, fm.height()), Qt.AlignmentFlag.AlignLeft | Qt.AlignmentFlag.AlignVCenter, index.data(models.WHAT))
@@ -81,7 +81,7 @@ class LineDelegate(QStyledItemDelegate):
         painter.setPen(pal.color(QPalette.ColorRole.PlaceholderText))
         painter.drawText(QRect(x, r.top() + PAD, 40, fm.height()), Qt.AlignmentFlag.AlignLeft, index.data(models.WHEN) or "")
         x += 44
-        f = option.font
+        f = QFont(option.font)
         f.setBold(True)
         painter.setFont(f)
         mine = index.data(models.MINE)
@@ -157,7 +157,9 @@ class MainWindow(QMainWindow):
             b.setMinimumHeight(40)
             b.setEnabled(False)
             el.addWidget(b, 0, Qt.AlignmentFlag.AlignHCenter)
-        el.addWidget(plain_label("Joining gives you a code to send to a member of the group; they add you. Nothing is read until then."), 0, Qt.AlignmentFlag.AlignHCenter)
+        hint = plain_label("Joining gives you a code to send to a member of the group;\nthey add you. Nothing is read until then.", wrap=False)
+        hint.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        el.addWidget(hint, 0, Qt.AlignmentFlag.AlignHCenter)
         el.addStretch(1)
         self.create_button.clicked.connect(self.create_group)
         self.join_button.clicked.connect(self.join_group)

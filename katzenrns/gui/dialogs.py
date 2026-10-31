@@ -126,6 +126,7 @@ class VoucherDialog(QDialog):
     def __init__(self, group: str, code: str, clipboard: Clipboard, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Your code for %s" % group)
+        self.setMinimumWidth(460)
         lay = QVBoxLayout(self)
         lay.addWidget(plain_label("Send this code to someone who is in the group. Whoever has it can add you to a group of theirs, once; after that it is spent."))
         self.code = QPlainTextEdit(code)
@@ -169,6 +170,7 @@ class AddMemberDialog(QDialog):
         self.peek = peek
         self.voucher: Optional[bytes] = None
         self.setWindowTitle("Add someone to %s" % group)
+        self.setMinimumWidth(460)
         self.lay = QVBoxLayout(self)
         self.lay.addWidget(plain_label("Paste the code they sent you."))
         self.code = QPlainTextEdit()
@@ -243,6 +245,7 @@ class AddMemberDialog(QDialog):
 
         self.petname.textChanged.connect(lambda _t: update())
         update()
+        self.adjustSize()
 
     def value(self) -> tuple:
         return self.voucher, display_name(self.petname.text())
@@ -252,6 +255,7 @@ class StopReadingDialog(QDialog):
     def __init__(self, group: str, name: str, parent=None):
         super().__init__(parent)
         self.setWindowTitle("Stop reading %s" % name)
+        self.setMinimumWidth(460)
         lay = QVBoxLayout(self)
         lay.addWidget(plain_label(
             "Stop reading %s in %s and delete what they sent? This cannot be undone here. "
