@@ -25,6 +25,10 @@ jobs:
           repository: katzenpost/katzenpost
           ref: reticulum-bridge
           path: katzenpost
+      - uses: actions/checkout@v4
+        with:
+          repository: katzenpost/pigeonhole_rns
+          path: pigeonhole_rns
       - uses: actions/setup-go@v5
         with:
           go-version: ">=1.26"
@@ -37,7 +41,7 @@ jobs:
       - name: Build and start the mixnet, with a bridge replica
         run: cd katzenpost/docker && make start wait
       - name: Start the mesh replica bridged to replica1
-        run: cd katzenpost/docker && make reticulum-start
+        run: cd katzenpost/docker && make reticulum-start pigeonhole_rns="$GITHUB_WORKSPACE/pigeonhole_rns"
       - name: Install katzenrns and the Go mixnet client
         run: |
           sudo apt-get update && sudo apt-get install -y gcc libegl1 libgl1
@@ -73,6 +77,10 @@ jobs:
           path: katzenpost
       - uses: actions/checkout@v4
         with:
+          repository: katzenpost/pigeonhole_rns
+          path: pigeonhole_rns
+      - uses: actions/checkout@v4
+        with:
           repository: katzenpost/katzenqt
           ref: groupchat-model-fixes
           path: katzenqt
@@ -89,7 +97,7 @@ jobs:
       - name: Build and start the mixnet, with a bridge replica
         run: cd katzenpost/docker && make start wait
       - name: Start the mesh replica bridged to replica1
-        run: cd katzenpost/docker && make reticulum-start
+        run: cd katzenpost/docker && make reticulum-start pigeonhole_rns="$GITHUB_WORKSPACE/pigeonhole_rns"
       - name: Install katzenrns and katzenqt
         run: |
           sudo apt-get update && sudo apt-get install -y gcc libegl1 libgl1 build-essential pkg-config libasound2-dev libxcb-cursor0 libpulse0 libfontconfig1 libxkbcommon0

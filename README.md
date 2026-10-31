@@ -4,7 +4,8 @@ Group chat over a Reticulum mesh, on Pigeonhole boxes. katzenrns speaks the same
 protocol as katzenqt does on the Katzenpost mixnet, so a group can have members on a mesh and
 members on the mixnet, talking through a bridge replica without knowing it. The protocol is
 [pigeonhole_protocols](https://github.com/katzenpost/pigeonhole_protocols) (its `py/`); the
-mesh replicas and the bridge are in the Katzenpost repository under `reticulum/`; the design is
+mesh replicas and the mesh half of the bridge are [pigeonhole_rns](https://github.com/katzenpost/pigeonhole_rns),
+the bridge socket on the mixnet replica is in the Katzenpost repository; the design is
 the Pigeonhole over Reticulum specification on the Katzenpost website.
 
 On the mesh, this client does the BACAP encryption itself with hpqc and sends sealed boxes to
