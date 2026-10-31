@@ -42,7 +42,7 @@ jobs:
         run: |
           sudo apt-get update && sudo apt-get install -y gcc libegl1 libgl1
           pip install -e .
-          go install github.com/katzenpost/pigeonhole_protocols/cmd/katzenqt1@main
+          GOPROXY=direct go install github.com/katzenpost/pigeonhole_protocols/cmd/katzenqt1@main
           echo "$HOME/go/bin" >> "$GITHUB_PATH"
       - name: katzenrns founds, katzenqt1 joins
         run: scripts/interop.sh host "$PWD/katzenpost" "$RUNNER_TEMP/host"
@@ -51,7 +51,7 @@ jobs:
       - name: Logs
         if: failure()
         run: |
-          for f in "$RUNNER_TEMP"/*/*.out "$RUNNER_TEMP"/*/*.err; do echo "--- $f"; tail -40 "$f"; done
+          for f in "$RUNNER_TEMP"/*/*.out "$RUNNER_TEMP"/*/*.err; do [ -f "$f" ] && { echo "--- $f"; tail -40 "$f"; }; done; true
           cd katzenpost/docker && make reticulum-logs | tail -60
       - name: Stop the mixnet
         if: always()
@@ -102,7 +102,7 @@ jobs:
       - name: Logs
         if: failure()
         run: |
-          for f in "$RUNNER_TEMP"/*/*.out "$RUNNER_TEMP"/*/*.err "$RUNNER_TEMP"/*/kqt.log; do echo "--- $f"; tail -40 "$f"; done
+          for f in "$RUNNER_TEMP"/*/*.out "$RUNNER_TEMP"/*/*.err "$RUNNER_TEMP"/*/kqt.log; do [ -f "$f" ] && { echo "--- $f"; tail -40 "$f"; }; done; true
           cd katzenpost/docker && make reticulum-logs | tail -60
       - name: Stop the mixnet
         if: always()
