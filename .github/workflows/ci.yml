@@ -1,0 +1,19 @@
+name: ci
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      # hpqc builds highctidh from source; PySide6 needs the GL and xcb libraries even offscreen.
+      - run: sudo apt-get update && sudo apt-get install -y gcc libegl1 libgl1 libxkbcommon0 libxcb-cursor0
+      - run: pip install -e ".[test]"
+      - run: pytest -q
+      - name: Two replicas and two shells on a local mesh
+        run: python tests/e2e_mesh.py --run-dir "$RUNNER_TEMP/mesh"
+      - name: Desktop client, offscreen
+        run: QT_QPA_PLATFORM=offscreen pytest -q tests/test_gui.py
+        if: hashFiles('tests/test_gui.py') != ''
