@@ -28,6 +28,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: katzenpost/pigeonhole_rns
+          ref: bridge-script-and-box-vectors # main, once pigeonhole_rns PR #1 merges
           path: pigeonhole_rns
       - uses: actions/setup-go@v5
         with:
@@ -80,6 +81,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: katzenpost/pigeonhole_rns
+          ref: bridge-script-and-box-vectors # main, once pigeonhole_rns PR #1 merges
           path: pigeonhole_rns
       - uses: actions/checkout@v4
         with:
