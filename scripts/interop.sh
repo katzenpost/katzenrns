@@ -5,7 +5,7 @@
 # message acknowledged by the other, which proves the control messages crossed too.
 #
 # Needs a docker mixnet with the bridge running (in the katzenpost checkout:
-# make -C docker start wait reticulum-start), the Go client on PATH as katzenqt1, and katzenrns
+# make -C docker start wait, then pigeonhole_rns/tests/docker_bridge.sh start docker/mixnet-alpine), the Go client on PATH as katzenqt1, and katzenrns
 # installed in the current Python.
 #
 #   scripts/interop.sh host|guest KATZENPOST_DIR [WORK_DIR]

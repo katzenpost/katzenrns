@@ -34,7 +34,8 @@ The headless shell takes `create g`, `join g`, `invite g CODE`, `send g text`, `
     pytest
     python tests/e2e_mesh.py --run-dir /some/scratch/dir      # two replicas, two shells
 
-With a docker mixnet up in a Katzenpost checkout (`make -C docker start wait reticulum-start`),
+With a docker mixnet up in a Katzenpost checkout (`make -C docker start wait`) and the mesh replica container up
+(`pigeonhole_rns/tests/docker_bridge.sh start katzenpost/docker/mixnet-alpine`),
 two scripts put a katzenrns shell on the mesh in one group with a mixnet client, through the
 bridge, each founding once and joining once, and check that each reads and acknowledges the
 other:

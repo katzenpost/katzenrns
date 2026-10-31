@@ -5,7 +5,7 @@
 # message acknowledged by the other, which proves the control messages crossed too.
 #
 # Needs a docker mixnet with the bridge running (in the katzenpost checkout:
-# make -C docker start wait reticulum-start), katzenrns installed in the current Python, and
+# make -C docker start wait, then pigeonhole_rns/tests/docker_bridge.sh start docker/mixnet-alpine), katzenrns installed in the current Python, and
 # katzenqt-headless on PATH or named by KATZENQT (katzenqt's .venv/bin/katzenqt-headless).
 #
 #   scripts/interop-katzenqt.sh host|guest KATZENPOST_DIR [WORK_DIR]
