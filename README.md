@@ -32,3 +32,15 @@ The headless shell takes `create g`, `join g`, `invite g CODE`, `send g text`, `
     pip install -e .[test]
     pytest
     python tests/e2e_mesh.py --run-dir /some/scratch/dir      # two replicas, two shells
+
+With a docker mixnet up in a Katzenpost checkout (`make -C docker start wait reticulum-start`),
+two scripts put a katzenrns shell on the mesh in one group with a mixnet client, through the
+bridge, each founding once and joining once, and check that each reads and acknowledges the
+other:
+
+    scripts/interop.sh host ../katzenpost            # with pigeonhole_protocols' Go katzenqt1
+    scripts/interop.sh guest ../katzenpost
+    KATZENQT=../katzenqt/.venv/bin/katzenqt-headless scripts/interop-katzenqt.sh host ../katzenpost
+    KATZENQT=../katzenqt/.venv/bin/katzenqt-headless scripts/interop-katzenqt.sh guest ../katzenpost
+
+The interop workflow runs all four on every push.

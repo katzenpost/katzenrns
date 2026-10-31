@@ -1,7 +1,7 @@
 name: interop
 # A katzenrns shell on a Reticulum mesh and a Katzenpost mixnet client in one group, through
-# the bridge replica, on a docker mixnet. The mixnet client is pigeonhole_protocols' katzenqt1,
-# which speaks the same protocol katzenqt does and is interop-tested against it there.
+# the bridge replica, on a docker mixnet. Two mixnet clients: pigeonhole_protocols' katzenqt1,
+# and katzenqt itself through its headless driver.
 on:
   workflow_dispatch:
   pull_request:
@@ -52,6 +52,57 @@ jobs:
         if: failure()
         run: |
           for f in "$RUNNER_TEMP"/*/*.out "$RUNNER_TEMP"/*/*.err; do echo "--- $f"; tail -40 "$f"; done
+          cd katzenpost/docker && make reticulum-logs | tail -60
+      - name: Stop the mixnet
+        if: always()
+        run: cd katzenpost/docker && make reticulum-stop stop || true
+  katzenqt:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    env:
+      no_mixdecoy: true
+      no_decoy: true
+      epoch_duration: 2m
+      no_metrics: true
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: katzenpost/katzenpost
+          ref: reticulum-bridge
+          path: katzenpost
+      - uses: actions/checkout@v4
+        with:
+          repository: katzenpost/katzenqt
+          ref: groupchat-model-fixes
+          path: katzenqt
+      - uses: actions/setup-go@v5
+        with:
+          go-version: ">=1.26"
+          cache: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: astral-sh/setup-uv@v5
+      - name: Configure podman socket
+        run: systemctl --user start podman.socket || true
+      - name: Build and start the mixnet, with a bridge replica
+        run: cd katzenpost/docker && make start wait
+      - name: Start the mesh replica bridged to replica1
+        run: cd katzenpost/docker && make reticulum-start
+      - name: Install katzenrns and katzenqt
+        run: |
+          sudo apt-get update && sudo apt-get install -y gcc libegl1 libgl1 build-essential pkg-config libasound2-dev libxcb-cursor0 libpulse0 libfontconfig1 libxkbcommon0
+          pip install -e .
+          cd katzenqt && uv sync --all-extras --dev --locked --python 3.12
+      - name: katzenrns founds, katzenqt joins
+        run: KATZENQT="$PWD/katzenqt/.venv/bin/katzenqt-headless" scripts/interop-katzenqt.sh host "$PWD/katzenpost" "$RUNNER_TEMP/host"
+      - name: katzenqt founds, katzenrns joins
+        run: KATZENQT="$PWD/katzenqt/.venv/bin/katzenqt-headless" scripts/interop-katzenqt.sh guest "$PWD/katzenpost" "$RUNNER_TEMP/guest"
+      - name: Logs
+        if: failure()
+        run: |
+          for f in "$RUNNER_TEMP"/*/*.out "$RUNNER_TEMP"/*/*.err "$RUNNER_TEMP"/*/kqt.log; do echo "--- $f"; tail -40 "$f"; done
           cd katzenpost/docker && make reticulum-logs | tail -60
       - name: Stop the mixnet
         if: always()
