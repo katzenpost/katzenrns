@@ -16,7 +16,9 @@ work=${3:-${WORK:-$PWD/interop-$role-$$}}
 here=$(cd "$(dirname "$0")/.." && pwd)
 mkdir -p "$work"
 net="$katzenpost/docker/mixnet-alpine"
-daemon=${DAEMON:-127.0.0.1:50333}
+# The client daemon's address, from the testnet's thin client config: its port is drawn from a
+# per-checkout seed.
+daemon=${DAEMON:-$(sed -n 's/^ *Address *= *"\(.*\)"/\1/p' "$net/client/thinclient.toml" | sed 's/^localhost:/127.0.0.1:/')}
 
 step() { echo "== $(date +%T) $*"; }
 
