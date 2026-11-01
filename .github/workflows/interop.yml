@@ -46,7 +46,7 @@ jobs:
         run: |
           sudo apt-get update && sudo apt-get install -y gcc libegl1 libgl1
           pip install -e .
-          GOPROXY=direct go install github.com/katzenpost/pigeonhole_protocols/cmd/katzenqt1@main
+          GOPROXY=direct go install github.com/katzenpost/pigeonhole_protocols/go/cmd/katzenqt1@main
           echo "$HOME/go/bin" >> "$GITHUB_PATH"
       - name: katzenrns founds, katzenqt1 joins
         run: scripts/interop.sh host "$PWD/katzenpost" "$RUNNER_TEMP/host"
