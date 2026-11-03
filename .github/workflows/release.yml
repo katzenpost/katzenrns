@@ -1,10 +1,13 @@
 name: release
 # A vX.Y.Z tag builds, smoke tests and publishes a GitHub release. A manual run does the
-# same and keeps the files as workflow artifacts, publishing nothing.
+# same and keeps the files as workflow artifacts, publishing nothing, as does a pull request
+# that changes how the release is built.
 on:
   push:
     tags: ["v*"]
   workflow_dispatch:
+  pull_request:
+    paths: [.github/workflows/release.yml, scripts/pyinstaller_entry.py, scripts/smoke-binary.sh, pyproject.toml]
 permissions:
   contents: write
 jobs:
