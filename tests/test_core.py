@@ -86,3 +86,18 @@ def test_two_shells_talk(tmp_path):
     assert "alice ✓✓: hello bob" in shown and "Robert: hey" in shown
     alice.close()
     bob.close()
+
+
+def test_wire_version_reaches_the_engine(tmp_path):
+    import pytest
+
+    from katzenrns.__main__ import arguments
+
+    assert arguments([]).wire_version == 4
+    assert arguments(["--wire-version", "3"]).wire_version == 3
+    with pytest.raises(SystemExit):
+        arguments(["--wire-version", "5"])
+    for v in (3, 4):
+        s = core.Session(str(tmp_path / str(v)), "a", SimBackend(max_plaintext=1000), wire_version=v)
+        assert s.client.engine.wire_version == v
+        s.close()
