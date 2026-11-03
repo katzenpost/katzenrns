@@ -19,7 +19,7 @@ open mode, BACAP is the only protection; a closed mesh adds a Noise layer in the
 Alice Cryptwalker on a Reticulum mesh, in one group with Bobby Lobby on
 [hushphone](https://github.com/katzenpost/hushphone) over the namenlos mixnet. Alice joined by
 voucher through a bridge replica; the greetings crossed it both ways, and the check marks on
-Alice's lines are the courier's (one) and Bobby's (two) acknowledgements.
+Alice's lines mean written to the mesh replica (one) and read by Bobby (two).
 
 ## Run
 
