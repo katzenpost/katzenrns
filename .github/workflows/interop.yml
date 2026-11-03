@@ -1,10 +1,17 @@
 name: interop
 # A katzenrns shell on a Reticulum mesh and a Katzenpost mixnet client in one group, through
 # the bridge replica, on a docker mixnet. Two mixnet clients: pigeonhole_protocols' katzenqt1,
-# and katzenqt itself through its headless driver.
+# and katzenqt itself through its headless driver. Each job runs one direction, so the pair
+# covers both: katzenrns founds and inducts katzenqt1, and katzenqt founds and inducts katzenrns.
 on:
   workflow_dispatch:
   pull_request:
+    # A docker mixnet takes half an hour: run it when the code or the scripts it drives change.
+    paths:
+      - "katzenrns/**"
+      - "scripts/**"
+      - "pyproject.toml"
+      - ".github/workflows/interop.yml"
   push:
     branches: [main]
   schedule:
@@ -50,8 +57,6 @@ jobs:
           echo "$HOME/go/bin" >> "$GITHUB_PATH"
       - name: katzenrns founds, katzenqt1 joins
         run: scripts/interop.sh host "$PWD/katzenpost" "$RUNNER_TEMP/host"
-      - name: katzenqt1 founds, katzenrns joins
-        run: scripts/interop.sh guest "$PWD/katzenpost" "$RUNNER_TEMP/guest"
       - name: Logs
         if: failure()
         run: |
@@ -105,8 +110,6 @@ jobs:
           sudo apt-get update && sudo apt-get install -y gcc libegl1 libgl1 build-essential pkg-config libasound2-dev libxcb-cursor0 libpulse0 libfontconfig1 libxkbcommon0
           pip install -e .
           cd katzenqt && uv sync --all-extras --dev --locked --python 3.12
-      - name: katzenrns founds, katzenqt joins
-        run: KATZENQT="$PWD/katzenqt/.venv/bin/katzenqt-headless" scripts/interop-katzenqt.sh host "$PWD/katzenpost" "$RUNNER_TEMP/host"
       - name: katzenqt founds, katzenrns joins
         run: KATZENQT="$PWD/katzenqt/.venv/bin/katzenqt-headless" scripts/interop-katzenqt.sh guest "$PWD/katzenpost" "$RUNNER_TEMP/guest"
       - name: Logs
