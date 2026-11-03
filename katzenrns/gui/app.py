@@ -77,7 +77,7 @@ class App:
 def run(args) -> int:
     import RNS
 
-    from ..transport import MeshBackend
+    from ..transport import BoxClient, MeshBackend
 
     qapp = QApplication.instance() or QApplication(sys.argv[:1])
     window = MainWindow()
@@ -94,14 +94,15 @@ def run(args) -> int:
             if not d.exec():
                 return 0
             name = d.value()
-    app = App(window, args.state, name, lambda: MeshBackend.connect(args.config, args.box_size, loglevel=RNS.LOG_DEBUG if args.verbose else RNS.LOG_ERROR), epoch_poll_s=args.epoch_poll)
-    window.show()
     log("reaching the mesh through Reticulum config %s, waiting up to 60 s for a replica announce" % (args.config or "~/.reticulum"))
-    # RNS installs signal handlers when it starts, which Python allows only on the main thread;
-    # they never run under Qt's event loop and would leave the window ignoring SIGTERM.
-    RNS.Reticulum(configdir=args.config, loglevel=RNS.LOG_DEBUG if args.verbose else RNS.LOG_ERROR)
+    # Making the client starts Reticulum, or attaches to a running rnsd, and installs signal
+    # handlers, which Python allows only on the main thread; they never run under Qt's event loop
+    # and would leave the window ignoring SIGTERM. Only the wait for a replica runs in App's thread.
+    boxes = BoxClient(args.config, args.box_size, loglevel=RNS.LOG_DEBUG if args.verbose else RNS.LOG_ERROR)
     signal.signal(signal.SIGINT, signal.SIG_DFL)
     signal.signal(signal.SIGTERM, signal.SIG_DFL)
+    app = App(window, args.state, name, lambda: MeshBackend.wait_for(boxes), epoch_poll_s=args.epoch_poll)
+    window.show()
     app.start()
     qapp.aboutToQuit.connect(app.close)
     return qapp.exec()
