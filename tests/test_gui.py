@@ -86,3 +86,15 @@ def test_two_windows(qapp, tmp_path):
     assert "~alice" in [bm.data(bm.index(i, 0)) for i in range(bm.rowCount())]
     alice.close()
     bob.close()
+
+
+def test_app_logs_mesh_failure(qapp, tmp_path, capsys):
+    from katzenrns.gui.app import App
+
+    def no_mesh():
+        raise RuntimeError("no Pigeonhole replica heard on the mesh")
+
+    w = MainWindow()
+    App(w, str(tmp_path), "alice", no_mesh)._connect()
+    assert "katzenrns: the mesh could not be reached: no Pigeonhole replica heard on the mesh" in capsys.readouterr().err
+    assert w.statusBar().currentMessage() == "Not on the mesh"
