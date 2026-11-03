@@ -24,9 +24,28 @@ Alice's lines mean written to the mesh replica (one) and read by Bobby (two).
 ## Run
 
     pip install katzenrns
-    rnsd &                      # or let katzenrns start its own Reticulum instance
-    katzenrns                   # the desktop client
-    katzenrns --headless --name bob     # commands on stdin, for scripts
+    katzenrns --replica 162.220.11.225:4242     # the desktop client, on namenlos's bridge
+    katzenrns --replica 162.220.11.225:4242 --headless --name bob     # commands on stdin, for scripts
+
+`--replica HOST:PORT` is all it takes to reach a replica on the internet: katzenrns starts a
+Reticulum instance of its own with one TCP link to it, from a config it writes under its state
+directory. The address above is the bridge replica on windfall2, which joins the mesh to the
+[namenlos](https://katzenpost.network) mixnet, so a group there can have members on both. The
+status bar reads "On the mesh" within about twenty seconds, once the replica has announced.
+
+Reticulum users with their own setup leave the flag out: katzenrns then attaches to the
+instance `~/.reticulum` describes, a running `rnsd` or one it starts from that config, and the
+replica is one interface in it:
+
+    [interfaces]
+      [[namenlos bridge replica]]
+        type = TCPClientInterface
+        enabled = yes
+        target_host = 162.220.11.225
+        target_port = 4242
+
+The box size defaults to namenlos's, 1549 bytes; a mesh of its own with another size sets
+`--box-size`.
 
 The first launch of the desktop client asks for the name you show others. Then: **Create a
 group**, or **Join a group**, which shows a voucher code to send to someone already in the
