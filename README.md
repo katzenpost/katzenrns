@@ -13,12 +13,13 @@ the nearest replica it hears announce. There is no daemon between the client and
 open mode, BACAP is the only protection; a closed mesh adds a Noise layer in the transport.
 
 <p>
-  <img src="docs/hushphone-interop.png" alt="katzenrns on the desktop, joined to a group through a Reticulum bridge: messages from a hushphone user on the mixnet, with read receipts" width="640">
+  <img src="docs/hushphone-interop.png" alt="katzenrns on the desktop: Alice Cryptwalker on a Reticulum mesh in a group with Bobby Lobby, a hushphone user on the mixnet, greeting each other, with read receipts" width="640">
 </p>
 
-katzenrns on a Reticulum mesh, in one group with [hushphone](https://github.com/katzenpost/hushphone)
-on the namenlos mixnet. meshgui joined by voucher through a bridge replica; the messages crossed it
-both ways, and the check marks are each side's read receipts for the other's.
+Alice Cryptwalker on a Reticulum mesh, in one group with Bobby Lobby on
+[hushphone](https://github.com/katzenpost/hushphone) over the namenlos mixnet. Alice joined by
+voucher through a bridge replica; the greetings crossed it both ways, and the check marks on
+Alice's lines mean written to the mesh replica (one) and read by Bobby (two).
 
 ## Run
 
