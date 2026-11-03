@@ -12,6 +12,14 @@ On the mesh, this client does the BACAP encryption itself with hpqc and sends se
 the nearest replica it hears announce. There is no daemon between the client and the mesh. In
 open mode, BACAP is the only protection; a closed mesh adds a Noise layer in the transport.
 
+<p>
+  <img src="docs/hushphone-interop.png" alt="katzenrns on the desktop, joined to a group through a Reticulum bridge: messages from a hushphone user on the mixnet, with read receipts" width="640">
+</p>
+
+katzenrns on a Reticulum mesh, in one group with [hushphone](https://github.com/katzenpost/hushphone)
+on the namenlos mixnet. meshgui joined by voucher through a bridge replica; the messages crossed it
+both ways, and the check marks are each side's read receipts for the other's.
+
 ## Run
 
     pip install katzenrns
