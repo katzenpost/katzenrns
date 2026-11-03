@@ -6,6 +6,7 @@ signal, and the window rebuilds what it shows from the session."""
 
 from __future__ import annotations
 
+import signal
 import sys
 import threading
 from typing import Optional
@@ -17,6 +18,10 @@ from PySide6.QtWidgets import QApplication
 from ..core import Session, default_state_dir
 from .dialogs import NameDialog
 from .window import MainWindow
+
+
+def log(msg: str) -> None:
+    print("katzenrns: " + msg, file=sys.stderr, flush=True)
 
 
 class Bridge(QObject):
@@ -46,14 +51,19 @@ class App:
 
     def _connect(self) -> None:
         try:
-            self.bridge.connected.emit(self.backend_factory())
+            backend = self.backend_factory()
         except Exception as e:
+            log("the mesh could not be reached: %s" % e)
             self.bridge.failed.emit(str(e))
+            return
+        log("on the mesh through %s" % backend.where())
+        self.bridge.connected.emit(backend)
 
     def _connected(self, backend) -> None:
         self.session = Session(self.state_dir, self.name or "", backend, on_change=self.bridge.changed.emit, epoch_poll_s=self.epoch_poll_s)
         self.window.attach(self.session)
         self.session.start()
+        log("in %d groups as %s, state in %s" % (len(self.session.client.chats()), self.session.me, self.state_dir))
 
     def _changed(self, changes: eng.Changes) -> None:
         self.window.refresh(changes)
@@ -86,6 +96,12 @@ def run(args) -> int:
             name = d.value()
     app = App(window, args.state, name, lambda: MeshBackend.connect(args.config, args.box_size, loglevel=RNS.LOG_DEBUG if args.verbose else RNS.LOG_ERROR), epoch_poll_s=args.epoch_poll)
     window.show()
+    log("reaching the mesh through Reticulum config %s, waiting up to 60 s for a replica announce" % (args.config or "~/.reticulum"))
+    # RNS installs signal handlers when it starts, which Python allows only on the main thread;
+    # they never run under Qt's event loop and would leave the window ignoring SIGTERM.
+    RNS.Reticulum(configdir=args.config, loglevel=RNS.LOG_DEBUG if args.verbose else RNS.LOG_ERROR)
+    signal.signal(signal.SIGINT, signal.SIG_DFL)
+    signal.signal(signal.SIGTERM, signal.SIG_DFL)
     app.start()
     qapp.aboutToQuit.connect(app.close)
     return qapp.exec()

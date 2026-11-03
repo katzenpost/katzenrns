@@ -13,6 +13,7 @@ import RNS
 from pigeonhole_protocols.katzenqt1.engine import DATA, NOT_FOUND, TOMBSTONE, Outcome
 from pigeonhole_protocols.transport.base import Backend, BoxExists, TransportError, next_index, read_position, write_position
 from pigeonhole_rns import PIGEONHOLE_CTX
+from pigeonhole_rns import rnsio
 from pigeonhole_rns import wire as replica_wire
 from pigeonhole_rns.client import Client as BoxClient
 from pigeonhole_rns.client import pad, unpad
@@ -76,6 +77,10 @@ class MeshBackend(Backend):
 
     def max_plaintext(self) -> int:
         return self.boxes.box_plaintext_size
+
+    def where(self) -> str:
+        d = self.boxes.entry()
+        return "replica %s, %d hops" % (d.hex(), rnsio.hops(d)) if d else "no replica reachable"
 
     def close(self) -> None:
         self.boxes.close()
