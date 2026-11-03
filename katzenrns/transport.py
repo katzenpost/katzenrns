@@ -27,7 +27,13 @@ class MeshBackend(Backend):
     def connect(cls, configdir, box_plaintext_size: int, loglevel: int = RNS.LOG_ERROR, wait: float = 60.0) -> "MeshBackend":
         """Attach to the Reticulum instance ``configdir`` describes (a running
         rnsd shared instance, or one started here) and wait for a replica."""
-        c = BoxClient(configdir, box_plaintext_size, loglevel=loglevel)
+        return cls.wait_for(BoxClient(configdir, box_plaintext_size, loglevel=loglevel), wait)
+
+    @classmethod
+    def wait_for(cls, c: BoxClient, wait: float = 60.0) -> "MeshBackend":
+        """Wait for a replica on an attached client. Starting Reticulum installs
+        signal handlers, which only the main thread may do; this part may run
+        on any thread."""
         if not c.wait_for_replica(timeout=wait):
             c.close()
             raise TransportError("no Pigeonhole replica heard on the mesh")

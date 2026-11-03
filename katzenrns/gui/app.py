@@ -67,7 +67,7 @@ class App:
 def run(args) -> int:
     import RNS
 
-    from ..transport import MeshBackend
+    from ..transport import BoxClient, MeshBackend
 
     qapp = QApplication.instance() or QApplication(sys.argv[:1])
     window = MainWindow()
@@ -84,7 +84,9 @@ def run(args) -> int:
             if not d.exec():
                 return 0
             name = d.value()
-    app = App(window, args.state, name, lambda: MeshBackend.connect(args.config, args.box_size, loglevel=RNS.LOG_DEBUG if args.verbose else RNS.LOG_ERROR), epoch_poll_s=args.epoch_poll)
+    # Reticulum is started here, on the main thread; the wait for a replica runs in App's thread.
+    boxes = BoxClient(args.config, args.box_size, loglevel=RNS.LOG_DEBUG if args.verbose else RNS.LOG_ERROR)
+    app = App(window, args.state, name, lambda: MeshBackend.wait_for(boxes), epoch_poll_s=args.epoch_poll)
     window.show()
     app.start()
     qapp.aboutToQuit.connect(app.close)
