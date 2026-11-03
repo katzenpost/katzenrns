@@ -23,7 +23,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: katzenpost/katzenpost
-          ref: reticulum-bridge
+          ref: katzenqt1-v4
           path: katzenpost
       - uses: actions/checkout@v4
         with:
@@ -46,7 +46,7 @@ jobs:
         run: |
           sudo apt-get update && sudo apt-get install -y gcc libegl1 libgl1
           pip install -e .
-          GOPROXY=direct go install github.com/katzenpost/pigeonhole_protocols/go/cmd/katzenqt1@main
+          GOPROXY=direct go install github.com/katzenpost/pigeonhole_protocols/go/cmd/katzenqt1@katzenqt1-v4
           echo "$HOME/go/bin" >> "$GITHUB_PATH"
       - name: katzenrns founds, katzenqt1 joins
         run: scripts/interop.sh host "$PWD/katzenpost" "$RUNNER_TEMP/host"
@@ -75,7 +75,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: katzenpost/katzenpost
-          ref: reticulum-bridge
+          ref: katzenqt1-v4
           path: katzenpost
       - uses: actions/checkout@v4
         with:

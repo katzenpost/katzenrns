@@ -17,7 +17,7 @@ dependencies = [
     "pigeonhole-protocols[reticulum] @ git+https://github.com/katzenpost/pigeonhole_protocols@katzenqt1-v4#subdirectory=py",
     "pigeonhole-rns @ git+https://github.com/katzenpost/pigeonhole_rns@main",
     "rns>=1.0",
-    "hpqc>=0.0.93",
+    "hpqc @ git+https://github.com/katzenpost/hpqc@katzenqt1-v4#subdirectory=py",
     "PySide6>=6.7",
 ]
 
