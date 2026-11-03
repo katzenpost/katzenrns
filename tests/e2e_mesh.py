@@ -108,6 +108,7 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--run-dir", required=True)
     ap.add_argument("--settle", type=float, default=10.0)
+    ap.add_argument("--katzenrns", help="run this katzenrns executable instead of the installed module")
     a = ap.parse_args()
 
     run = os.path.abspath(a.run_dir)
@@ -139,7 +140,7 @@ def main() -> int:
             log = open(os.path.join(run, "chat-%s.log" % name), "w")
             c = Proc(
                 name,
-                [sys.executable, "-m", "katzenrns", "--headless", "--config", cfgdir, "--state", os.path.join(run, "chat-" + name),
+                ([a.katzenrns] if a.katzenrns else [sys.executable, "-m", "katzenrns"]) + ["--headless", "--config", cfgdir, "--state", os.path.join(run, "chat-" + name),
                  "--name", name, "--box-size", str(BOX), "--epoch-poll", "5"],
                 env, pkg_root, log,
             )

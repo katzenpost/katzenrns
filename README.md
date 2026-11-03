@@ -82,6 +82,25 @@ The headless shell takes `create g`, `join g`, `invite g CODE`, `send g text`, `
 `members g`, `scan g`, `remove g NAME`, `leave g` and prints `READY`, `VOUCHER=...`,
 `JOINED g` and `LINE g who: text` as things happen.
 
+## Releases
+
+Each release on the [releases page](https://github.com/katzenpost/katzenrns/releases) has a
+single-file Linux executable, `katzenrns-VERSION-linux-x86_64`, with Python, Reticulum, Qt and
+the rest inside, built on Ubuntu 22.04 to run on distributions with glibc 2.35 or newer; and the
+wheel and source archive. To verify and run one, with the files and `SHA256SUMS` in one directory:
+
+    sha256sum --check --ignore-missing SHA256SUMS
+    chmod +x katzenrns-VERSION-linux-x86_64
+    ./katzenrns-VERSION-linux-x86_64 --replica 162.220.11.225:4242
+
+It takes the same options as `katzenrns` below. The desktop client uses the OpenGL and X11
+libraries a desktop already has; the headless shell needs none.
+
+To cut a release, set the version in `pyproject.toml` and push the matching tag,
+`git tag vX.Y.Z && git push origin vX.Y.Z`; the release workflow builds, smoke tests and
+publishes it. Running that workflow by hand builds the same files as workflow artifacts and
+publishes nothing.
+
 ## Test
 
     pip install -e .[test]
