@@ -34,7 +34,7 @@ from ..core import Session
 from . import models
 from .dialogs import AddMemberDialog, Clipboard, GroupNameDialog, StopReadingDialog, VoucherDialog, peek_voucher, plain_label
 
-SENDER_COLUMN = 110
+SENDER_COLUMN = 150
 PAD = 6
 
 
@@ -86,7 +86,7 @@ class LineDelegate(QStyledItemDelegate):
         painter.setFont(f)
         mine = index.data(models.MINE)
         painter.setPen(pal.color(QPalette.ColorRole.Link) if mine else pal.color(QPalette.ColorRole.Text))
-        who = fm.elidedText(index.data(models.WHO), Qt.TextElideMode.ElideRight, SENDER_COLUMN)
+        who = QFontMetrics(f).elidedText(index.data(models.WHO), Qt.TextElideMode.ElideRight, SENDER_COLUMN)
         painter.drawText(QRect(x, r.top() + PAD, SENDER_COLUMN, fm.height()), Qt.AlignmentFlag.AlignRight, who)
         x += SENDER_COLUMN + PAD
         painter.setFont(option.font)
