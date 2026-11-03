@@ -20,7 +20,7 @@ import sys
 import RNS
 
 from .core import Session, default_state_dir
-from .transport import MeshBackend
+from pigeonhole_protocols.transport.reticulum import MeshBackend
 
 
 def arguments(argv=None):

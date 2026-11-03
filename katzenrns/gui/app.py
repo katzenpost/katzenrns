@@ -77,7 +77,8 @@ class App:
 def run(args) -> int:
     import RNS
 
-    from ..transport import BoxClient, MeshBackend
+    from pigeonhole_protocols.transport.reticulum import MeshBackend
+    from pigeonhole_rns.client import Client as BoxClient
 
     qapp = QApplication.instance() or QApplication(sys.argv[:1])
     window = MainWindow()
