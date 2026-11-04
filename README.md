@@ -73,6 +73,10 @@ The status bar reads "On the mesh" within about twenty seconds, once the replica
 The box size defaults to namenlos's, 1549 bytes; a mesh of its own with another size sets
 `--box-size`.
 
+`--wire-version 3|4` picks the katzenqt1 wire version this client writes and mints: 3 is the
+version 3 map form with long vouchers, for peers that read only that; 4, the default, is the
+compact form. Either version reads both.
+
 The first launch of the desktop client asks for the name you show others. Then: **Create a
 group**, or **Join a group**, which shows a voucher code to send to someone already in the
 group; they paste it into **Add someone**. The code is the same text katzenqt uses, so a

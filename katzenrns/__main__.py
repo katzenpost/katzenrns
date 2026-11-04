@@ -20,7 +20,7 @@ import sys
 import RNS
 
 from .core import Session, default_state_dir
-from .transport import MeshBackend
+from pigeonhole_protocols.transport.reticulum import MeshBackend
 
 
 def arguments(argv=None):
@@ -31,6 +31,7 @@ def arguments(argv=None):
     ap.add_argument("--state", default=default_state_dir(), help="where this client keeps its state")
     ap.add_argument("--name", help="the name you show others (asked once)")
     ap.add_argument("--box-size", type=int, default=1549, help="the replicas' box plaintext size (default: namenlos's)")
+    ap.add_argument("--wire-version", type=int, choices=(3, 4), default=4, help="the katzenqt1 wire version written and minted: 3 (map form, long vouchers) or 4 (compact; default)")
     ap.add_argument("--epoch-poll", type=float, default=60.0)
     ap.add_argument("-v", "--verbose", action="store_true")
     a = ap.parse_args(argv)
@@ -74,7 +75,7 @@ def main(argv=None) -> int:
             print(e, file=sys.stderr)
             return 1
         shell = None
-        session = Session(a.state, a.name, backend, on_change=lambda ch: shell.on_change(ch), epoch_poll_s=a.epoch_poll)
+        session = Session(a.state, a.name, backend, on_change=lambda ch: shell.on_change(ch), epoch_poll_s=a.epoch_poll, wire_version=a.wire_version)
         shell = Shell(session)
         try:
             shell.run()

@@ -34,12 +34,13 @@ class Bridge(QObject):
 
 
 class App:
-    def __init__(self, window: MainWindow, state_dir: str, name: Optional[str], backend_factory, epoch_poll_s: float = 60.0):
+    def __init__(self, window: MainWindow, state_dir: str, name: Optional[str], backend_factory, epoch_poll_s: float = 60.0, wire_version: int = 4):
         self.window = window
         self.state_dir = state_dir
         self.name = name
         self.backend_factory = backend_factory
         self.epoch_poll_s = epoch_poll_s
+        self.wire_version = wire_version
         self.bridge = Bridge()
         self.bridge.changed.connect(self._changed)
         self.bridge.connected.connect(self._connected)
@@ -60,7 +61,7 @@ class App:
         self.bridge.connected.emit(backend)
 
     def _connected(self, backend) -> None:
-        self.session = Session(self.state_dir, self.name or "", backend, on_change=self.bridge.changed.emit, epoch_poll_s=self.epoch_poll_s)
+        self.session = Session(self.state_dir, self.name or "", backend, on_change=self.bridge.changed.emit, epoch_poll_s=self.epoch_poll_s, wire_version=self.wire_version)
         self.window.attach(self.session)
         self.session.start()
         log("in %d groups as %s, state in %s" % (len(self.session.client.chats()), self.session.me, self.state_dir))
@@ -77,7 +78,8 @@ class App:
 def run(args) -> int:
     import RNS
 
-    from ..transport import BoxClient, MeshBackend
+    from pigeonhole_protocols.transport.reticulum import MeshBackend
+    from pigeonhole_rns.client import Client as BoxClient
 
     qapp = QApplication.instance() or QApplication(sys.argv[:1])
     window = MainWindow()
@@ -101,7 +103,7 @@ def run(args) -> int:
     boxes = BoxClient(args.config, args.box_size, loglevel=RNS.LOG_DEBUG if args.verbose else RNS.LOG_ERROR)
     signal.signal(signal.SIGINT, signal.SIG_DFL)
     signal.signal(signal.SIGTERM, signal.SIG_DFL)
-    app = App(window, args.state, name, lambda: MeshBackend.wait_for(boxes), epoch_poll_s=args.epoch_poll)
+    app = App(window, args.state, name, lambda: MeshBackend.wait_for(boxes), epoch_poll_s=args.epoch_poll, wire_version=args.wire_version)
     window.show()
     app.start()
     qapp.aboutToQuit.connect(app.close)

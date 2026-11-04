@@ -122,12 +122,12 @@ class Petnames:
 class Session:
     """The client, open on a state directory, over a backend."""
 
-    def __init__(self, state_dir: str, name: str, backend: Backend, on_change: Optional[Callable[[eng.Changes], None]] = None, epoch_poll_s: float = 60.0, client: Optional[Client] = None):
+    def __init__(self, state_dir: str, name: str, backend: Backend, on_change: Optional[Callable[[eng.Changes], None]] = None, epoch_poll_s: float = 60.0, client: Optional[Client] = None, wire_version: int = 4):
         """``client`` replaces the threaded client, for tests in virtual time."""
         os.makedirs(state_dir, exist_ok=True)
         self.state_dir = state_dir
         self.backend = backend
-        self.client = client or Client(state_dir, name, backend, epoch_poll_s=epoch_poll_s, on_change=on_change)
+        self.client = client or Client(state_dir, name, backend, epoch_poll_s=epoch_poll_s, on_change=on_change, wire_version=wire_version)
         if client is not None and on_change is not None:
             self.client.on_change = on_change
         self.petnames = Petnames(state_dir)
