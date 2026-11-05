@@ -77,6 +77,14 @@ The box size defaults to namenlos's, 1549 bytes; a mesh of its own with another 
 version 3 map form with long vouchers, for peers that read only that; 4, the default, is the
 compact form. Either version reads both.
 
+`--query-mode auto|request|channel` picks how queries reach a replica, one of the two
+[query modes](https://github.com/katzenpost/pigeonhole_rns#query-modes) a replica serves:
+`request` sends Link requests, with Resources for large queries; `channel` sends Channel messages,
+for replicas on Reticulum stacks without requests, such as Reticulum-rs, and uses only replicas
+that announce Channel support. `auto`, the default, starts with requests. If a replica announces
+Channel support but does not answer requests, it falls back to Channel and keeps using Channel
+for that replica.
+
 The first launch of the desktop client asks for the name you show others. Then: **Create a
 group**, or **Join a group**, which shows a voucher code to send to someone already in the
 group; they paste it into **Add someone**. The code is the same text katzenqt uses, so a

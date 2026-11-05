@@ -6,6 +6,8 @@ headless shells. alice founds a group, bob joins through a voucher alice
 inducts, and they talk.
 
     python tests/e2e_mesh.py --run-dir /path/to/scratch
+    python tests/e2e_mesh.py --run-dir DIR --modes request channel
+    python tests/e2e_mesh.py --run-dir DIR --channel-only   # replicas without write and read requests
 
 Not collected by pytest: it spawns processes and binds a TCP port."""
 
@@ -50,6 +52,15 @@ LEAF_CONFIG = """[reticulum]
     target_host = 127.0.0.1
     target_port = %d
 """ % HUB_PORT
+
+
+# A replica as a Reticulum stack without Link requests would serve it: Channel queries only.
+CHANNEL_ONLY = """import sys, RNS
+register = RNS.Destination.register_request_handler
+RNS.Destination.register_request_handler = lambda self, path, *a, **k: None if path in ("write", "read") else register(self, path, *a, **k)
+from pigeonhole_rns.cli import main
+sys.exit(main())
+"""
 
 
 def write_config(d: str, text: str) -> str:
@@ -109,6 +120,8 @@ def main() -> int:
     ap.add_argument("--run-dir", required=True)
     ap.add_argument("--settle", type=float, default=10.0)
     ap.add_argument("--katzenrns", help="run this katzenrns executable instead of the installed module")
+    ap.add_argument("--modes", nargs=2, metavar=("ALICE", "BOB"), default=("auto", "auto"), help="each shell's --query-mode")
+    ap.add_argument("--channel-only", action="store_true", help="replicas answer Channel queries only")
     a = ap.parse_args()
 
     run = os.path.abspath(a.run_dir)
@@ -127,7 +140,7 @@ def main() -> int:
             log = open(os.path.join(run, "replica-%s.log" % name), "w")
             procs.append(
                 subprocess.Popen(
-                    [sys.executable, "-m", "pigeonhole_rns.cli", "--config", cfgdir, "--box-size", str(BOX), "-v",
+                    [sys.executable] + (["-c", CHANNEL_ONLY] if a.channel_only else ["-m", "pigeonhole_rns.cli"]) + ["--config", cfgdir, "--box-size", str(BOX), "-v",
                      "replica", "--storage", os.path.join(run, "store-" + name), "--announce-interval", "3"],
                     stdout=log, stderr=subprocess.STDOUT, env=env, cwd=pkg_root,
                 )
@@ -135,19 +148,19 @@ def main() -> int:
             time.sleep(2.0)
         time.sleep(a.settle)
 
-        def chat(name: str) -> Proc:
+        def chat(name: str, mode: str) -> Proc:
             cfgdir = write_config(os.path.join(run, "rns-" + name), LEAF_CONFIG)
             log = open(os.path.join(run, "chat-%s.log" % name), "w")
             c = Proc(
                 name,
                 ([a.katzenrns] if a.katzenrns else [sys.executable, "-m", "katzenrns"]) + ["--headless", "--config", cfgdir, "--state", os.path.join(run, "chat-" + name),
-                 "--name", name, "--box-size", str(BOX), "--epoch-poll", "5"],
+                 "--name", name, "--box-size", str(BOX), "--epoch-poll", "5", "--query-mode", mode],
                 env, pkg_root, log,
             )
             chats.append(c)
             return c
 
-        alice, bob = chat("alice"), chat("bob")
+        alice, bob = chat("alice", a.modes[0]), chat("bob", a.modes[1])
         time.sleep(a.settle)
 
         alice.expect("READY", 120)
