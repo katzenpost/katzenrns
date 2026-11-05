@@ -64,7 +64,7 @@ def test_two_shells_talk(tmp_path):
     bsh.command("join g")
     settle([alice, bob], 10_000)
     code = [l for l in bout.getvalue().splitlines() if l.startswith("VOUCHER=")][0][len("VOUCHER="):]
-    ash.command("invite g " + code)
+    ash.command("invite g " + " ".join(code[i:i + 8] for i in range(0, len(code), 8)))  # spaced, as pasted from a chat
     settle([alice, bob], 60_000)
     assert "JOINED g" in bout.getvalue()
     ash.command("send g hello bob")
