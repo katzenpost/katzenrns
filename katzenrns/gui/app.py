@@ -79,7 +79,8 @@ def run(args) -> int:
     import RNS
 
     from pigeonhole_protocols.transport.reticulum import MeshBackend
-    from pigeonhole_rns.client import Client as BoxClient
+
+    from ..mesh import Boxes
 
     qapp = QApplication.instance() or QApplication(sys.argv[:1])
     window = MainWindow()
@@ -100,7 +101,7 @@ def run(args) -> int:
     # Making the client starts Reticulum, or attaches to a running rnsd, and installs signal
     # handlers, which Python allows only on the main thread; they never run under Qt's event loop
     # and would leave the window ignoring SIGTERM. Only the wait for a replica runs in App's thread.
-    boxes = BoxClient(args.config, args.box_size, loglevel=RNS.LOG_DEBUG if args.verbose else RNS.LOG_ERROR)
+    boxes = Boxes(args.config, args.box_size, loglevel=RNS.LOG_DEBUG if args.verbose else RNS.LOG_ERROR, mode=args.query_mode)
     signal.signal(signal.SIGINT, signal.SIG_DFL)
     signal.signal(signal.SIGTERM, signal.SIG_DFL)
     app = App(window, args.state, name, lambda: MeshBackend.wait_for(boxes), epoch_poll_s=args.epoch_poll, wire_version=args.wire_version)

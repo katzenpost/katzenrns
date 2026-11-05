@@ -20,6 +20,7 @@ import sys
 import RNS
 
 from .core import Session, default_state_dir
+from .mesh import MODES, Boxes
 from pigeonhole_protocols.transport.reticulum import MeshBackend
 
 
@@ -32,6 +33,7 @@ def arguments(argv=None):
     ap.add_argument("--name", help="the name you show others (asked once)")
     ap.add_argument("--box-size", type=int, default=1549, help="the replicas' box plaintext size (default: namenlos's)")
     ap.add_argument("--wire-version", type=int, choices=(3, 4), default=4, help="the katzenqt1 wire version written and minted: 3 (map form, long vouchers) or 4 (compact; default)")
+    ap.add_argument("--query-mode", choices=MODES, default="auto", help="how queries reach a replica: request (Link requests and Resources), channel (Channel messages), or auto (default): requests, falling back to Channel per replica")
     ap.add_argument("--epoch-poll", type=float, default=60.0)
     ap.add_argument("-v", "--verbose", action="store_true")
     a = ap.parse_args(argv)
@@ -70,7 +72,7 @@ def main(argv=None) -> int:
             print("--name is needed in headless mode", file=sys.stderr)
             return 2
         try:
-            backend = MeshBackend.connect(a.config, a.box_size, loglevel=RNS.LOG_DEBUG if a.verbose else RNS.LOG_ERROR)
+            backend = MeshBackend.wait_for(Boxes(a.config, a.box_size, loglevel=RNS.LOG_DEBUG if a.verbose else RNS.LOG_ERROR, mode=a.query_mode))
         except Exception as e:
             print(e, file=sys.stderr)
             return 1
