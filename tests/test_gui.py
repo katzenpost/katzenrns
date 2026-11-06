@@ -47,7 +47,7 @@ def lines(w):
 
 
 def test_two_windows(qapp, tmp_path):
-    sim, clock = SimBackend(max_plaintext=1000), [0]
+    sim, clock = SimBackend(max_plaintext=1000, real_vouchers=True), [0]  # peek_voucher reads a real payload
     aw, alice = make(tmp_path, "alice", sim, clock)
     bw, bob = make(tmp_path, "bob", sim, clock)
     assert aw.stack.currentIndex() == 0  # the empty screen

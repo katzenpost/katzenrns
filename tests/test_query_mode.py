@@ -6,7 +6,7 @@ it, and keeps the mode that answered."""
 import threading
 
 from katzenrns.__main__ import arguments
-from katzenrns.mesh import Boxes
+from pigeonhole_protocols.transport.reticulum import Boxes
 
 A, B = b"a" * 16, b"b" * 16
 

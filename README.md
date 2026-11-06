@@ -70,12 +70,14 @@ other Reticulum programs, so a running rnsd and this instance coexist without se
 ### In both cases
 
 The status bar reads "On the mesh" within about twenty seconds, once the replica has announced.
-The box size defaults to namenlos's, 1549 bytes; a mesh of its own with another size sets
-`--box-size`.
+Boxes are written at the mesh size, 256 bytes, one Link packet; a box too long for that, and every
+box read, may be any allowed size: 256, namenlos's 1549, or what `--box-size` adds.
 
-`--wire-version 3|4` picks the katzenqt1 wire version this client writes and mints: 3 is the
-version 3 map form with long vouchers, for peers that read only that; 4, the default, is the
-compact form. Either version reads both.
+`--wire-version 3|4|5` picks the katzenqt1 wire version this client writes and mints: 3 is the
+version 3 map form with long vouchers, for peers that read only that; 4 is the compact form; 5,
+the default, also packs queued messages into one box. Every version reads all three. A message
+this client cannot read, of a newer version or an unknown type, is shown as a notice asking to
+update the app.
 
 `--query-mode auto|request|channel` picks how queries reach a replica, one of the two
 [query modes](https://github.com/katzenpost/pigeonhole_rns#query-modes) a replica serves:

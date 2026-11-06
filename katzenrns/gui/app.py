@@ -34,7 +34,7 @@ class Bridge(QObject):
 
 
 class App:
-    def __init__(self, window: MainWindow, state_dir: str, name: Optional[str], backend_factory, epoch_poll_s: float = 60.0, wire_version: int = 4):
+    def __init__(self, window: MainWindow, state_dir: str, name: Optional[str], backend_factory, epoch_poll_s: float = 60.0, wire_version: int = 5):
         self.window = window
         self.state_dir = state_dir
         self.name = name
@@ -78,9 +78,7 @@ class App:
 def run(args) -> int:
     import RNS
 
-    from pigeonhole_protocols.transport.reticulum import MeshBackend
-
-    from ..mesh import Boxes
+    from pigeonhole_protocols.transport.reticulum import Boxes, MeshBackend
 
     qapp = QApplication.instance() or QApplication(sys.argv[:1])
     window = MainWindow()
