@@ -35,3 +35,16 @@ def test_replica_wants_host_and_port(tmp_path):
 def test_replica_and_config_exclude_each_other(tmp_path):
     with pytest.raises(SystemExit):
         arguments(["--state", str(tmp_path), "--replica", "h:1", "--config", str(tmp_path)])
+
+
+def test_boxes_are_written_at_the_box_size():
+    from katzenrns.__main__ import mesh_backend
+
+    class Boxes:
+        box_plaintext_size = 1000
+
+        def wait_for_replica(self, timeout):
+            return True
+
+    m = mesh_backend(Boxes(), 1000)
+    assert m.max_plaintext() == 1000 and 1000 in m.sizes and 1549 in m.sizes
