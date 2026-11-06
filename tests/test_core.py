@@ -5,6 +5,8 @@ virtual time, and the sanitizer every remote string passes through."""
 
 import io
 
+from pigeonhole_protocols.katzenqt1 import engine as eng
+from pigeonhole_protocols.katzenqt1 import wire
 from pigeonhole_protocols.katzenqt1.client import SyncClient
 from pigeonhole_protocols.transport.sim import SimBackend
 
@@ -84,6 +86,14 @@ def test_two_shells_talk(tmp_path):
     ash.command("show g")
     shown = aout.getvalue()
     assert "alice ✓✓: hello bob" in shown and "Robert: hey" in shown
+    # A message of a type this app does not know is shown as a notice.
+    c = alice.client.state.chat(alice.client.chat_id("g"))
+    raw = wire.Gcm(membership_hash=eng.membership(c.group), msg_type=13).encode()
+    for o in c.group.compose(raw):
+        c.jobs.append(eng.Job(c.fresh(), o.token, None, wire.frame(raw)))
+    ash.command("send g after")
+    settle([alice, bob], 60_000)
+    assert "this app cannot show (type 13, version 5): update the app" in bout.getvalue()
     alice.close()
     bob.close()
 
@@ -93,11 +103,11 @@ def test_wire_version_reaches_the_engine(tmp_path):
 
     from katzenrns.__main__ import arguments
 
-    assert arguments([]).wire_version == 4
+    assert arguments([]).wire_version == 5
     assert arguments(["--wire-version", "3"]).wire_version == 3
     with pytest.raises(SystemExit):
-        arguments(["--wire-version", "5"])
-    for v in (3, 4):
+        arguments(["--wire-version", "6"])
+    for v in (3, 4, 5):
         s = core.Session(str(tmp_path / str(v)), "a", SimBackend(max_plaintext=1000), wire_version=v)
         assert s.client.engine.wire_version == v
         s.close()

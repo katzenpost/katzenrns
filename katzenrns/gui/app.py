@@ -34,7 +34,7 @@ class Bridge(QObject):
 
 
 class App:
-    def __init__(self, window: MainWindow, state_dir: str, name: Optional[str], backend_factory, epoch_poll_s: float = 60.0, wire_version: int = 4):
+    def __init__(self, window: MainWindow, state_dir: str, name: Optional[str], backend_factory, epoch_poll_s: float = 60.0, wire_version: int = 5):
         self.window = window
         self.state_dir = state_dir
         self.name = name
@@ -78,9 +78,9 @@ class App:
 def run(args) -> int:
     import RNS
 
-    from pigeonhole_protocols.transport.reticulum import MeshBackend
+    from pigeonhole_protocols.transport.reticulum import Boxes
 
-    from ..mesh import Boxes
+    from ..__main__ import mesh_backend
 
     qapp = QApplication.instance() or QApplication(sys.argv[:1])
     window = MainWindow()
@@ -104,7 +104,7 @@ def run(args) -> int:
     boxes = Boxes(args.config, args.box_size, loglevel=RNS.LOG_DEBUG if args.verbose else RNS.LOG_ERROR, mode=args.query_mode)
     signal.signal(signal.SIGINT, signal.SIG_DFL)
     signal.signal(signal.SIGTERM, signal.SIG_DFL)
-    app = App(window, args.state, name, lambda: MeshBackend.wait_for(boxes), epoch_poll_s=args.epoch_poll, wire_version=args.wire_version)
+    app = App(window, args.state, name, lambda: mesh_backend(boxes, args.box_size), epoch_poll_s=args.epoch_poll, wire_version=args.wire_version)
     window.show()
     app.start()
     qapp.aboutToQuit.connect(app.close)

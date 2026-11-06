@@ -20,8 +20,7 @@ import sys
 import RNS
 
 from .core import Session, default_state_dir
-from .mesh import MODES, Boxes
-from pigeonhole_protocols.transport.reticulum import MeshBackend
+from pigeonhole_protocols.transport.reticulum import QUERY_MODES, Boxes, MeshBackend
 
 
 def arguments(argv=None):
@@ -31,9 +30,9 @@ def arguments(argv=None):
     ap.add_argument("--replica", metavar="HOST:PORT", help="reach this replica over TCP from an instance of katzenrns's own, instead of ~/.reticulum")
     ap.add_argument("--state", default=default_state_dir(), help="where this client keeps its state")
     ap.add_argument("--name", help="the name you show others (asked once)")
-    ap.add_argument("--box-size", type=int, default=1549, help="the replicas' box plaintext size (default: namenlos's)")
-    ap.add_argument("--wire-version", type=int, choices=(3, 4), default=4, help="the katzenqt1 wire version written and minted: 3 (map form, long vouchers) or 4 (compact; default)")
-    ap.add_argument("--query-mode", choices=MODES, default="auto", help="how queries reach a replica: request (Link requests and Resources), channel (Channel messages), or auto (default): requests, falling back to Channel per replica")
+    ap.add_argument("--box-size", type=int, default=1549, help="the box plaintext size written, one the replicas take (default: namenlos's)")
+    ap.add_argument("--wire-version", type=int, choices=(3, 4, 5), default=5, help="the katzenqt1 wire version written and minted: 3 (map form, long vouchers), 4 (compact) or 5 (packed messages; default)")
+    ap.add_argument("--query-mode", choices=QUERY_MODES, default="auto", help="how queries reach a replica: request (Link requests and Resources), channel (Channel messages), or auto (default): requests, falling back to Channel per replica")
     ap.add_argument("--epoch-poll", type=float, default=60.0)
     ap.add_argument("-v", "--verbose", action="store_true")
     a = ap.parse_args(argv)
@@ -42,6 +41,12 @@ def arguments(argv=None):
             ap.error("--replica and --config are two ways to reach the mesh; give one")
         a.config = replica_config(a.state, a.replica)
     return a
+
+
+def mesh_backend(boxes, box_size: int) -> MeshBackend:
+    # shortcut: writes at box_size, not pigeonhole_protocols' 256 B mesh size, which pigeonhole_rns
+    # replicas refuse (their mesh size is 267); write at "mesh" once the two agree.
+    return MeshBackend.wait_for(boxes, write_size=box_size)
 
 
 def replica_config(state_dir: str, replica: str) -> str:
@@ -72,7 +77,7 @@ def main(argv=None) -> int:
             print("--name is needed in headless mode", file=sys.stderr)
             return 2
         try:
-            backend = MeshBackend.wait_for(Boxes(a.config, a.box_size, loglevel=RNS.LOG_DEBUG if a.verbose else RNS.LOG_ERROR, mode=a.query_mode))
+            backend = mesh_backend(Boxes(a.config, a.box_size, loglevel=RNS.LOG_DEBUG if a.verbose else RNS.LOG_ERROR, mode=a.query_mode), a.box_size)
         except Exception as e:
             print(e, file=sys.stderr)
             return 1
