@@ -103,7 +103,7 @@ def test_wire_version_reaches_the_engine(tmp_path):
 
     from katzenrns.__main__ import arguments
 
-    assert arguments([]).wire_version == 5
+    assert arguments([]).wire_version == 4
     assert arguments(["--wire-version", "3"]).wire_version == 3
     with pytest.raises(SystemExit):
         arguments(["--wire-version", "6"])

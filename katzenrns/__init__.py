@@ -6,4 +6,4 @@ speaks on the Katzenpost mixnet, so a group can have members on both, over
 pigeonhole_protocols' Reticulum transport. This package adds a headless shell
 for scripts and a PySide6 desktop client."""
 
-__version__ = "0.0.1"
+__version__ = "0.1.0"

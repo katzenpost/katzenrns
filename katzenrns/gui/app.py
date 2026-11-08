@@ -34,7 +34,7 @@ class Bridge(QObject):
 
 
 class App:
-    def __init__(self, window: MainWindow, state_dir: str, name: Optional[str], backend_factory, epoch_poll_s: float = 60.0, wire_version: int = 5):
+    def __init__(self, window: MainWindow, state_dir: str, name: Optional[str], backend_factory, epoch_poll_s: float = 60.0, wire_version: int = 4):
         self.window = window
         self.state_dir = state_dir
         self.name = name

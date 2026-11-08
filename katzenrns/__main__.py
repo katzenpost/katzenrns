@@ -31,7 +31,7 @@ def arguments(argv=None):
     ap.add_argument("--state", default=default_state_dir(), help="where this client keeps its state")
     ap.add_argument("--name", help="the name you show others (asked once)")
     ap.add_argument("--box-size", type=int, default=1549, help="the box plaintext size written, one the replicas take (default: namenlos's)")
-    ap.add_argument("--wire-version", type=int, choices=(3, 4, 5), default=5, help="the katzenqt1 wire version written and minted: 3 (map form, long vouchers), 4 (compact) or 5 (packed messages; default)")
+    ap.add_argument("--wire-version", type=int, choices=(3, 4, 5), default=4, help="the katzenqt1 wire version written and minted: 3 (map form, long vouchers), 4 (compact; default) or 5 (packed messages, which katzenqt, jam and frank_chat cannot read yet)")
     ap.add_argument("--query-mode", choices=QUERY_MODES, default="auto", help="how queries reach a replica: request (Link requests and Resources), channel (Channel messages), or auto (default): requests, falling back to Channel per replica")
     ap.add_argument("--epoch-poll", type=float, default=60.0)
     ap.add_argument("-v", "--verbose", action="store_true")
