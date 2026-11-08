@@ -79,7 +79,7 @@ The box size defaults to namenlos's, 1549 bytes; a mesh of its own with another 
 version 3 map form with long vouchers, for peers that read only that; 4, the default, is the
 compact form; 5 also packs queued messages into one box. katzenqt, jam and frank_chat read only
 versions 3 and 4 and show a version 5 message only as a notice that it cannot be shown, so 5 is
-for groups whose members all run katzenrns. katzenrns reads all three. A message this client
+for groups whose members all run katzenrns or hushphone. katzenrns reads all three. A message this client
 cannot read, of a newer version or an unknown type, is shown as a notice asking to update the
 app.
 
