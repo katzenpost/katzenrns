@@ -12,6 +12,7 @@ import subprocess
 os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 
 import pytest
+import shiboken6
 from PySide6.QtWidgets import QApplication
 
 from katzenrns.core import QUIET, parse_voucher, voucher_qr, voucher_qr_text
@@ -111,7 +112,11 @@ def test_zbar_reads_both_back(qapp, tmp_path):
 
 
 def test_dialog_shows_the_qr_beside_the_text(qapp):
-    d = VoucherDialog("g", CODE, Clipboard())
+    clip = Clipboard()
+    d = VoucherDialog("g", CODE, clip)
     assert d.code.toPlainText() == CODE
     shown = d.qr.pixmap().toImage()
     assert shown == voucher_qr_image(CODE).convertToFormat(shown.format())
+    # Unparented: delete now, not at interpreter exit after QApplication, which crashed CI.
+    shiboken6.delete(d)
+    shiboken6.delete(clip.timer)
