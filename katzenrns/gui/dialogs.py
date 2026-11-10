@@ -12,7 +12,7 @@ from typing import Callable, Optional
 
 from hpqc.voucher import stateless as voucher_stateless
 from PySide6.QtCore import QObject, Qt, QTimer, Signal
-from PySide6.QtGui import QGuiApplication
+from PySide6.QtGui import QGuiApplication, QImage, QPixmap
 from PySide6.QtWidgets import (
     QDialog,
     QDialogButtonBox,
@@ -25,7 +25,7 @@ from PySide6.QtWidgets import (
     QVBoxLayout,
 )
 
-from ..core import MAX_NAME, display_name, parse_voucher
+from ..core import MAX_NAME, QUIET, display_name, parse_voucher, voucher_qr
 
 CLIPBOARD_SECONDS = 60
 
@@ -120,6 +120,15 @@ class GroupNameDialog(QDialog):
         return self.name.text().strip()
 
 
+def voucher_qr_image(code: str, scale: int = 6) -> QImage:
+    """The voucher QR, dark on light, quiet zone included, ``scale`` pixels
+    per module."""
+    qr = voucher_qr(code)
+    n = (qr.get_size() + 2 * QUIET) * scale
+    data = bytes(0 if qr.get_module(x // scale - QUIET, y // scale - QUIET) else 255 for y in range(n) for x in range(n))
+    return QImage(data, n, n, n, QImage.Format.Format_Grayscale8).copy()  # copy: the QImage borrows data otherwise
+
+
 class VoucherDialog(QDialog):
     """The code to hand to a member of the group, out of band."""
 
@@ -132,7 +141,13 @@ class VoucherDialog(QDialog):
         self.code = QPlainTextEdit(code)
         self.code.setReadOnly(True)
         self.code.setMaximumHeight(60)
-        lay.addWidget(self.code)
+        self.qr = QLabel()
+        self.qr.setPixmap(QPixmap.fromImage(voucher_qr_image(code)))
+        self.qr.setAccessibleName("Voucher QR code")
+        codes = QHBoxLayout()
+        codes.addWidget(self.qr)
+        codes.addWidget(self.code, 1, Qt.AlignmentFlag.AlignVCenter)
+        lay.addLayout(codes)
         row = QHBoxLayout()
         copy = QPushButton("Copy")
         self.copied = plain_label("")
