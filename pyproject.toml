@@ -7,7 +7,7 @@ build-backend = "flit_core.buildapi"
 
 [project]
 name = "katzenrns"
-version = "0.0.1"
+version = "0.1.0"
 description = "Group chat over Reticulum with Pigeonhole boxes, interoperable with katzenqt on the Katzenpost mixnet."
 readme = "README.md"
 requires-python = ">=3.10"

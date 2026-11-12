@@ -23,7 +23,9 @@ Alice's lines mean written to the mesh replica (one) and read by Bobby (two).
 
 ## Run
 
-    pip install katzenrns
+    pip install git+https://github.com/katzenpost/katzenrns
+
+or take the single-file executable from a release, below.
 
 katzenrns needs a Reticulum instance with a path to a Pigeonhole replica. There are two ways to
 have one, and the choice is only about Reticulum; the chat is the same in both.
@@ -74,10 +76,12 @@ The box size defaults to namenlos's, 1549 bytes; a mesh of its own with another 
 `--box-size`. Boxes are read at any allowed size: that one, namenlos's and the mesh's.
 
 `--wire-version 3|4|5` picks the katzenqt1 wire version this client writes and mints: 3 is the
-version 3 map form with long vouchers, for peers that read only that; 4 is the compact form; 5,
-the default, also packs queued messages into one box. Every version reads all three. A message
-this client cannot read, of a newer version or an unknown type, is shown as a notice asking to
-update the app.
+version 3 map form with long vouchers, for peers that read only that; 4, the default, is the
+compact form; 5 also packs queued messages into one box. katzenqt, jam and frank_chat read only
+versions 3 and 4 and show a version 5 message only as a notice that it cannot be shown, so 5 is
+for groups whose members all run katzenrns or hushphone. katzenrns reads all three. A message this client
+cannot read, of a newer version or an unknown type, is shown as a notice asking to update the
+app.
 
 `--query-mode auto|request|channel` picks how queries reach a replica, one of the two
 [query modes](https://github.com/katzenpost/pigeonhole_rns#query-modes) a replica serves:
@@ -107,7 +111,7 @@ wheel and source archive. To verify and run one, with the files and `SHA256SUMS`
     chmod +x katzenrns-VERSION-linux-x86_64
     ./katzenrns-VERSION-linux-x86_64 --replica 162.220.11.225:4242
 
-It takes the same options as `katzenrns` below. The desktop client uses the OpenGL and X11
+It takes the same options as `katzenrns` above. The desktop client uses the OpenGL and X11
 libraries a desktop already has; the headless shell needs none.
 
 To cut a release, set the version in `pyproject.toml` and push the matching tag,
