@@ -3,7 +3,7 @@
 """The headless shell: commands on standard input, lines as they arrive on
 standard output, for scripts and interop tests. The markers a script waits
 on are those of pigeonhole_protocols' Go client: READY once a replica is
-heard, VOUCHER=<code> once minted, JOINED <group>, and LINE <group>
+heard, VOUCHER=<code> once minted (then its QR code), JOINED <group>, and LINE <group>
 <who>: <text> for each line delivered.
 
     create GROUP            start a group
@@ -28,7 +28,7 @@ from typing import Dict, Set
 
 from pigeonhole_protocols.katzenqt1 import engine as eng
 
-from .core import Session
+from .core import Session, voucher_qr_text
 
 
 class Shell:
@@ -56,6 +56,7 @@ class Shell:
             if code and chat not in self.minted:
                 self.minted.add(chat)
                 self.say("VOUCHER=%s" % code)
+                self.say(voucher_qr_text(code))
             seen = self.shown.setdefault(chat, set())
             for line in self.s.client.lines(chat):
                 if line.id in seen:

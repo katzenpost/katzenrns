@@ -94,11 +94,12 @@ for that replica.
 The first launch of the desktop client asks for the name you show others. Then: **Create a
 group**, or **Join a group**, which shows a voucher code to send to someone already in the
 group; they paste it into **Add someone**. The code is the same text katzenqt uses, so a
-katzenqt user can add you, and you them.
+katzenqt user can add you, and you them. It is also shown as the QR code hushphone, the
+T-Deck and katzenqt draw for it, module for module.
 
 The headless shell takes `create g`, `join g`, `invite g CODE`, `send g text`, `show g`,
-`members g`, `scan g`, `remove g NAME`, `leave g` and prints `READY`, `VOUCHER=...`,
-`JOINED g` and `LINE g who: text` as things happen.
+`members g`, `scan g`, `remove g NAME`, `leave g` and prints `READY`, `VOUCHER=...`
+(followed by the code as a QR in Unicode half blocks), `JOINED g` and `LINE g who: text` as things happen.
 
 ## Releases
 

@@ -16,6 +16,7 @@ from typing import Callable, Dict, List, Optional, Tuple
 from pigeonhole_protocols.katzenqt1 import engine as eng
 from pigeonhole_protocols.katzenqt1.client import Client
 from pigeonhole_protocols.transport.base import Backend
+from qrcodegen import QrCode, QrSegment
 
 MAX_NAME = 30
 MAX_TEXT = 16 * 1024
@@ -95,6 +96,26 @@ def parse_voucher(text: str) -> Optional[bytes]:
     except Exception:
         return None
     return v if len(v) == 32 else None
+
+
+QUIET = 4
+
+
+def voucher_qr(code: str) -> QrCode:
+    """The voucher code as hushphone, the T-Deck and katzenqt draw it: the
+    raw code in one byte-mode segment, level M, the smallest version. The
+    same encoder, so the same modules, not merely the same decoded text."""
+    return QrCode.encode_segments([QrSegment.make_bytes(code.encode())], QrCode.Ecc.MEDIUM, boostecl=False)
+
+
+def voucher_qr_text(code: str) -> str:
+    """The voucher QR for a terminal, two modules per character in Unicode
+    half blocks, quiet zone included. Blocks are the light modules, so on a
+    light-on-dark terminal it reads dark on light, as qrencode -t UTF8 does."""
+    qr = voucher_qr(code)
+    span = range(-QUIET, qr.get_size() + QUIET)
+    cell = {(True, True): "█", (True, False): "▀", (False, True): "▄", (False, False): " "}
+    return "\n".join("".join(cell[not qr.get_module(x, y), not qr.get_module(x, y + 1)] for x in span) for y in span[::2])
 
 
 # ---- the session ----
